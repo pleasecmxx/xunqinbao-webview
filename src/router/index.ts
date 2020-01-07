@@ -27,11 +27,11 @@ const routes = [
     path: '/private',
     name: '隐私协议',
     component: () => import('./../views/Private.vue')
-  }
+  },
 ]
 
 const router = new VueRouter({
-  mode: 'history',
+  mode: 'hash',
   base: process.env.BASE_URL,
   routes
 })

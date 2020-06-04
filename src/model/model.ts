@@ -82,7 +82,37 @@ function GetQueryString(url: String) {
   return null;
 }
 
+
+function getUrlKey (name:string) {
+  return (
+    decodeURIComponent(
+      //@ts-ignore
+      (new RegExp("[?|&]" + name + "=" + "([^&;]+?)(&|#|;|$)").exec(
+        location.href
+      ) || [, ""])[1].replace(/\+/g, "%20")
+    ) || null
+  );
+}
+
+function GetClear(str:string) {
+
+  if (str == null || str == undefined) {
+    return '';
+  } else {
+    var tempStr = str
+      .replace(/&lt;/g, "<")
+      .replace(/&gt;/g, ">")
+      .replace(/&quot;/g, "\"")
+      .replace(/&apos;/g, "'")
+      .replace(/&amp;/g, "&")
+      .replace(/&nbsp;/g, '').replace(/<\/?.+?\/?>/g, '').replace(/<[^>]+>/g, "")
+    return tempStr;
+  }
+}
+
 export {
   postRequrst,
-  GetQueryString
+  GetQueryString,
+  getUrlKey,
+  GetClear
 }

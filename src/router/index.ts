@@ -28,6 +28,21 @@ const routes = [
     name: '隐私协议',
     component: () => import('./../views/Private.vue')
   },
+  {
+    path: '/invate',
+    name: '邀请',
+    component: () => import('./../views/Invate.vue')
+  },
+  {
+    path: '/news',
+    name: '新闻',
+    component: () => import('./../views/News.vue')
+  },
+  {
+    path: '/video-list',
+    name: '新闻',
+    component: () => import('./../views/VideoList.vue')
+  }
 ]
 
 const router = new VueRouter({

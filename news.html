@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <meta http-equiv="Expires" content="0">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Cache-control" content="no-cache">
+    <meta http-equiv="Cache" content="no-cache">
+    <link rel=stylesheet href=https://b-gold-cdn.xitu.io/ionicons/2.0.1/css/ionicons.min.css>
+    <link rel=stylesheet href=https://b-gold-cdn.xitu.io/asset/fw-icon/1.0.9/iconfont.css>
+    <link href=https://b-gold-cdn.xitu.io/v3/static/css/0.9c3b1301627380d53cfd.css rel=stylesheet>
+    <!-- <link rel="preload" href="https://cdn.bootcss.com/axios/0.18.0/axios.min.js" as="script"> -->
+    <!-- <link rel="preload" href="https://res.wx.qq.com/open/js/jweixin-1.4.0.js" as="script"> -->
+    <title>每日趣闻</title>
+    <script src="https://cdn.bootcss.com/jquery/3.3.1/jquery.min.js"></script>
+    <!-- <script src="https://res.wx.qq.com/open/js/jweixin-1.4.0.js"></script>
+  <script src="https://cdn.bootcss.com/axios/0.18.0/axios.min.js"></script> -->
+    <!-- <script type="text/javascript"
+        src="https://api.map.baidu.com/api?v=2.0&ak=7lGBA1oQX3vmpkH3jqMNhLzsCIQnbNYe&s=1"></script> -->
+    <style>
+        body,
+        html {
+            width: 100%;
+            height: 100%;
+            background-color: white !important;
+        }
+
+        body {
+            box-sizing: border-box !important;
+            padding: 0px 15px !important;
+            background-color: white !important;
+            font-size: 16px;
+            line-height: 2;
+            padding-bottom: 60px;
+            /* position: absolute !important;
+              margin: 0 !important; */
+            /* font-size: 18px !important; */
+            /* line-height: 28px !important;
+              text-indent: 36px !important;
+              box-sizing: border-box !important;
+              font-family: 'Avenir', Helvetica, Arial, sans-serif !important;
+              -webkit-font-smoothing: antialiased !important;
+              -moz-osx-font-smoothing: grayscale !important;
+              color: #222222 !important;
+              display: flex !important;
+              flex-direction: column !important;
+              animation: fade .3s !important;
+              -webkit-tap-highlight-color: transparent !important;
+              word-wrap: break-wordsd !important;
+              text-align: justify !important;
+              list-style-position: inside !important;
+              list-style-type: square !important;
+              margin-block-start: 1em !important;
+              margin-block-end: 1em !important;
+              margin-inline-start: 0px !important;
+              margin-inline-end: 0px !important; */
+        }
+
+        a,
+        button,
+        input {
+            margin: 1rem 1.5rem;
+        }
+
+        img {
+            width: 0;
+            height: 0;
+        }
+
+        #wrap>p {
+            /*   		display: block;*/
+            word-wrap: break-word !important;
+            font-size: 16px !important;
+            color: #222222 !important;
+            text-align: justify !important;
+            list-style-position: inside !important;
+            list-style-type: square !important;
+            margin-block-start: 1em !important;
+            margin-block-end: 1em !important;
+            margin-inline-start: 0px !important;
+            margin-inline-end: 0px !important;
+        }
+
+        .my_head {
+            width: '100%';
+            /* height: 100px; */
+            border-bottom: 1px solid #eeeeee;
+            margin-bottom: 12px;
+        }
+
+        #title {
+            font-size: 20px;
+            line-height: 29px;
+        }
+
+        #mytime,
+        #origin {
+            font-size: 12px;
+            color: #999999;
+            overflow: hidden;
+            word-wrap: none;
+            padding: 0;
+            margin: 0 0 12px 0
+        }
+
+        .bottom-line {
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: nowrap;
+            overflow: hidden;
+            padding: 0;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="my_head">
+        <h3 id="title"></h3>
+        <div class="bottom-line">
+          <p id="mytime"></p>
+          <p id="origin"></p>
+        </div>
+      </div>
+      <div id="wrap"></div>
+</body>
+<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+<script>
+    var BASE_URL = 'https://xqb.yuncshop.com';
+    var DETAILS_API = '/api/Apiindex/articleDetails';
+
+    function getUrlKey(name) {
+        return (
+            decodeURIComponent(
+                (new RegExp("[?|&]" + name + "=" + "([^&;]+?)(&|#|;|$)").exec(
+                    location.href
+                ) || [, ""])[1].replace(/\+/g, "%20")
+            ) || null
+        );
+    }
+
+    function initData() {
+        axios.post(BASE_URL + '/api/Apiindex/articleDetails', { aid: getUrlKey('news_id') })
+            .then(res => {
+                console.log(res);
+                if (res.data.code === 1) {
+                    // document.title = res.list.title;
+                    $('#wrap').html(res.data.list.content);
+                    $('#title').html(res.data.list.title);
+                    $('#mytime').html(res.data.list.time);
+                    $('#origin').html(res.data.list.source);
+                }else {
+                    alert("未知文章")
+                }
+            })
+            .catch(e => {
+
+            })
+    };
+
+    initData();
+</script>
+
+</html>

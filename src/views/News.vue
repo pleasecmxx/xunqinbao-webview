@@ -10,182 +10,78 @@
             <img :src="this.data.portrait"
                  class="user-logo" />
             <div class="row-msg">
-              <p class="name">{{this.data.name}}</p>
+              <p class="name">{{this.data.title}}</p>
               <p class="time">时间：{{this.data.time}}</p>
             </div>
           </div>
           <p style="font-size: 14px; color:#333;margin: 0;margin-bottom: 3px;">阅读：197</p>
         </div>
-        <div v-for="item in this.data.content"
-             :key="item.index">
-          <img :src="item.val"
-               class="content-img"
-               v-if="item.type === 1" />
-          <p class="content-text"
-             v-else>{{item.val}}</p>
+        <div class="content-container" v-html="data.content">
+            <!-- {{data.content}} -->
         </div>
       </div>
-      <div @click="showpop"
-           class="bottom-line"
-           v-if="this.commentList.length === 0">留下热心线索</div>
-      <div v-else>
-        <div class="list-head">
-          <p class="close-text"
-             style="font-size: 14px;">好心留言</p>
-          <P @click="showpop"
-             class="close-text"
-             style="text-align: right; font-size: 14px;">写留言</P>
-        </div>
-        <div class="comment-line"
-             v-for="item in this.commentList"
-             :key="item.index">
-          <img :src="item.logo"
-               class="comment-logo" />
-          <div class="comment-right">
-            <div class="box">
-              <p class="comment-name">{{item.name}}</p>
-              <P class="comment-content">{{item.content}}</P>
-            </div>
-            <p class="comment-time">{{item.time}}</p>
-          </div>
-        </div>
-        <div class="footer">————— 到底了 —————</div>
-      </div>
-    </div>
-    <van-popup v-model="show"
-               position="bottom"
-               round
-               :style="{ height: '40%' }">
-      <div class="pop-head">
-        <p @click="closePop"
-           class="close-text">关闭</p>
-        <p style="font-size: 16px;text-align:center; width: 100%;margin: 10px 0;">写留言</p>
-        <button @click="sendComment"
-                class="my-btn"
-                v-if="!this.optionLoading">提交</button>
-        <button class="my-btn"
-                style="opacity: 0.72"
-                v-else>提交中</button>
-      </div>
-      <textarea class="input"
-                placeholder="请输入留言"
-                v-model="comment"
-                rows="100" />
-      </van-popup>
+  </div>
   </div>
 </template>
 
 <script>
 // @ is an alias to /src
-import HelloWorld from '@/components/HelloWorld.vue'
-import { postRequrst, GetQueryString, getUrlKey } from './../model//model'
-import { Icon, Toast, Row, Col } from 'vant';
+import HelloWorld from "@/components/HelloWorld.vue";
+import {
+  postRequrst,
+  GetQueryString,
+  getUrlKey,
+  GetClear
+} from "./../model//model";
+import { Icon, Toast, Row, Col } from "vant";
 
 export default {
-  name: 'home',
+  name: "home",
   components: {
     HelloWorld
   },
-  data () {
+  data() {
     return {
-      data: {},
+      data: {
+        content: ""
+      },
       commentList: [],
       loading: true,
       show: false,
-      comment: '',
+      comment: "",
       optionLoading: false,
-      page: 0,
-    }
+      page: 0
+    };
   },
-  created () {
+  created() {
     Toast.loading({
-      message: '加载中...',
+      message: "加载中...",
       forbidClick: true,
-      loadingType: 'circular',
+      loadingType: "circular",
       duration: 0
     });
-    postRequrst('/api/Apiindex/releaseLocationUpperDetails', { luid: getUrlKey('luid') })
+    postRequrst("/api/Apiindex/articleDetails", { aid: getUrlKey("news_id") })
       .then(res => {
         console.log(res);
+        Toast.clear();
         if (res.code === 1) {
           this.loading = false;
+        //   let content = res.list.content;
+        //   content = GetClear(content);
+        //   res.list.content = content;
           this.data = res.list;
-          this.getComment()
         } else {
-          Toast(res.msg)
+          Toast(res.msg);
         }
       })
       .catch(err => {
-        console.log(err)
+        Toast.clear();
         Toast("网络出错了，请稍后重试");
-      })
+      });
   },
 
-  methods: {
-    closePop () {
-      this.show = false
-    },
-
-    getComment () {
-      let params = {
-        page: this.page,
-        luid: getUrlKey('luid')
-      };
-      postRequrst('/api/Apiindex/locationUpperComment', params)
-        .then(res => {
-          console.log(res);
-          if (res.code == 1) {
-            this.commentList = res.list;
-            Toast.clear()
-          } else {
-            Toast(res.msg)
-          }
-        })
-        .catch(err => {
-          Toast("网络出错了，请稍后重试")
-        })
-    },
-
-    showpop () {
-      this.show = true
-    },
-
-    sendComment () {
-      if (this.comment === '') {
-        return Toast("请先输入您的评论")
-      }
-      this.optionLoading = true;
-      let params = {
-        luid: getUrlKey('luid'),
-        content: this.comment,
-      };
-      postRequrst('/api/Apiindex/releaseLocationUpperComment', params)
-        .then(res => {
-          console.log(res)
-          this.optionLoading = false
-          this.show = false;
-          if (res.code === 1) {
-            Toast.loading({
-              message: '加载中...',
-              forbidClick: true,
-              loadingType: 'circular',
-              duration: 0
-            });
-            this.getComment();
-            Toast("评论成功哦～");
-            this.comment = ''
-          } else {
-            Toast(res.msg)
-          }
-        })
-        .catch(err => {
-          this.optionLoading = false
-          this.show = false;
-          Toast("网络出错了，请稍后重试哦！～")
-        })
-    }
-  }
-}
+  methods: {}
+};
 </script>
 <style scoped>
 .home {
@@ -194,6 +90,7 @@ export default {
   min-height: 100%;
   background-color: #f2f2f2;
   padding: 0;
+  padding-bottom: 52px;
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
@@ -203,8 +100,8 @@ export default {
 }
 
 .content-text {
-  font-size: 14px;
-  color: '#000';
+  font-size: 15px;
+  color: "#000";
   margin: 0px;
   line-height: 22px;
   margin-bottom: 12px;
@@ -229,7 +126,8 @@ export default {
   flex-direction: row;
   justify-content: space-between;
   align-items: flex-end;
-  margin: 12px 0;
+  /* margin: 12px 0; */
+  padding: 12px;
   box-sizing: border-box;
 }
 
@@ -254,6 +152,13 @@ export default {
   color: #000000;
   font-weight: 600;
   margin: 0;
+  max-width: 200px;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  word-wrap: none;
+  word-break: keep-all;
+  height: 21px;
+  line-height: 21px;
 }
 
 .time {
@@ -397,5 +302,11 @@ export default {
   text-align: center;
   padding-bottom: 16px;
   color: #999999;
+}
+
+.content-container {
+    width: 10rem;
+    box-sizing: border-box;
+    padding: 12px;
 }
 </style>

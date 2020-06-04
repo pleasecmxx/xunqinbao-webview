@@ -3,34 +3,47 @@
     <div class="bg-content">
       <img src="./../assets/login_bg.png"
            class="login-bg" />
-      <img src="https://dss0.baidu.com/6ONWsjip0QIZ8tyhnq/it/u=2224702878,3024512157&fm=85&app=63&f=JPEG?w=121&h=75&s=9000A2F90C5696CE1410383A03001050"
+      <img :src="headImg"
            class="user-logo" />
     </div>
     <div class="my-row">
-      <p class="user-name">用户</p>
-      <van-notice-bar color="#1989fa"
-                      class="my-line"
-                      background="#ecebeb"
-                      speed="80"
-                      left-icon="info-o">
+      <p class="user-name">{{name}}</p>
+      <van-notice-bar 
+        color="#1989fa"
+        class="my-line"
+        background="#ecebeb"
+        :speed="80"
+        left-icon="info-o">
         通过定位找到男朋友的位置&nbsp;&nbsp;&nbsp;&nbsp;通过定位找到老婆的位置&nbsp;&nbsp;&nbsp;&nbsp;通过定位找到孩子的位置
       </van-notice-bar>
     </div>
     <div class="input-box">
       <img src="./../assets/account-icon.png"
            class="input-icon" />
-      <input placeholder="请输入手机号"
-             type="number"
-             class="row-input" />
+      <input 
+        placeholder="请输入手机号"
+        type="number"
+        class="row-input" 
+        v-model="phone"
+      />
     </div>
     <div class="code-row">
       <div class="code-row-left">
         <img class="input-icon"
              src="./../assets/pass-icon.png" />
-        <input placeholder="验证码"
-               class="code-input" />
+        <input 
+          placeholder="验证码"
+          class="code-input" 
+          v-model="code"
+        />
       </div>
-      <div class="code-btn">获取验证码</div>
+      <div @click="sendCode" class="code-btn" v-if="!optionLoading">获取验证码</div>
+      <div v-else>
+        <div style="opacity: 0.72" class="code-btn" v-if="showTime">
+          {{codeTime}}秒后重试
+        </div>
+        <div style="opacity: 0.72" class="code-btn" v-else>请稍等</div>
+      </div>
     </div>
     <div style="margin-top: 54px;" class='row'>
       <img src="./../assets/timer-icon.png"
@@ -41,23 +54,120 @@
                       format="HH:mm:ss" />
     </div>
     <p class='notice'>后链接将会失效，赶快去体验吧</p>
-    <div class="jump-btn">快去APP快速定位</div>
+    <div @click="goTodownload" class="jump-btn">快去APP快速定位</div>
     <p class="small-text">一键定位，快速找人</p>
   </div>
 </template>
 
 <script>
+import { postRequrst, GetQueryString, getUrlKey } from "./../model//model";
+import { Icon, Toast, Row, Col } from "vant";
 export default {
-  name: 'Login',
-  data () {
+  name: "Login",
+  data() {
     return {
-      phone: '',
-      password: '',
+      phone: "",
+      code: "",
       loading: false,
-      time: 20000000
+      time: 20000000,
+      codeTime: 60,
+      headImg: null,
+      name: "",
+      optionLoading: false,
+      showTime: false,
+      delayhandle: null
+    };
+  },
+  created() {
+    let _headImg = getUrlKey("head_img");
+    this.name = getUrlKey("name");
+    console.log(_headImg);
+    if (_headImg) {
+      this.headImg = _headImg;
+    } else {
+    }
+  },
+  beforeDestroy() {
+    this.delayhandle && clearTimeout(this.delayhandle)
+  },
+  methods: {
+    goTodownload() {
+      if (this.phone === "" || this.phone.length !== 11) {
+        return Toast("请输入正确的手机号");
+      }
+      if (this.code === "") {
+        return Toast("请输入验证码");
+      }
+      Toast.loading({
+        message: "请稍等...",
+        forbidClick: true,
+        loadingType: "circular",
+        duration: 0
+      });
+      let params = {
+        mobile: this.phone,
+        code: getUrlKey("code"),
+        yzm: this.code,
+        register_source: 1
+      };
+      console.log("参数", params);
+      postRequrst("/api/Apilogin/registerWeb", params)
+        .then(res => {
+          Toast.clear();
+          console.log(res);
+          if (res.code === 1) {
+            window.location.href = "https://fanyi.qq.com/";
+          } else {
+            Toast(res.msg);
+          }
+        })
+        .catch(err => {
+          Toast.clear();
+          Toast(err + "");
+        });
+    },
+
+    sendCode() {
+      if (this.phone === "" || this.phone.length !== 11) {
+        Toast("请输入正确的手机号");
+      } else {
+        let params = {
+          mobile: this.phone
+        };
+        this.optionLoading = true;
+        postRequrst("/api/Apilogin/sendCode", params)
+          .then(res => {
+            console.log(res);
+            if (res.code == 1) {
+              Toast("验证码已发送，请注意查收");
+              this.showTime = true;
+              this.counterTimer();
+            } else {
+              Toast(res.msg);
+            }
+          })
+          .catch(err => {
+            console.log(err);
+            Toast(err + "");
+          });
+      }
+    },
+
+    counterTimer() {
+      this.delayhandle = setTimeout(() => {
+        if (this.codeTime === 0) {
+          this.optionLoading = false;
+          this.showTime = false;
+          this.codeTime = 60;
+          return false;
+        } else {
+          this.codeTime = this.codeTime - 1;
+          this.counterTimer();
+        }
+      }, 1000);
     }
   }
-}
+};
 </script>
 
 <style>
@@ -69,7 +179,7 @@ export default {
   overflow-y: scroll;
 }
 div {
-  box-sizing: border-box
+  box-sizing: border-box;
 }
 
 .bg-content {
@@ -105,7 +215,7 @@ div {
 }
 
 .my-line {
-  width: 5rem;
+  width: 4.2rem;
   height: 22px;
   border-radius: 6px;
   margin-left: 12px;
@@ -176,7 +286,7 @@ div {
 }
 
 .code-btn:active {
-  background-color: rgb(7, 82, 194);
+  background-color: rgb(17, 63, 133);
 }
 
 .code-input {
@@ -194,7 +304,10 @@ div {
 
 .user-name {
   color: #000;
-  font-size: 22px;
+  width: 100px;
+  overflow: hidden;
+  /* background-color: red; */
+  font-size: 18px;
   font-weight: 600;
   margin: 0;
   margin-bottom: 5px;
@@ -236,12 +349,12 @@ div {
   text-align: center;
   font-size: 20px;
   color: #fff;
-  margin: 12px auto
+  margin: 12px auto;
 }
 
 .small-text {
   font-size: 12px;
-  color:#7c7a7a;
+  color: #7c7a7a;
   text-align: center;
   margin-top: 24px;
 }

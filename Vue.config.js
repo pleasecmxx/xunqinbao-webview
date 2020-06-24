@@ -13,7 +13,7 @@
 //   // },
 //  }
 const Timestamp = new Date().getTime();
-const app_version = '1.0.2'
+const app_version = '1.0.7'
 module.exports = {
   runtimeCompiler: true,
   publicPath: './',

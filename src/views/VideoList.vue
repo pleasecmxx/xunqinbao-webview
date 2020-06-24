@@ -1,6 +1,7 @@
 <template>
    <div>
        <div v-for="item in list" :key="item.index">
+            <h5 class="display-name">{{item.displayName}}</h5>
             <video-player 
                 class="video-player vjs-custom-skin" 
                 :playsinline="true" 
@@ -68,17 +69,14 @@ export default {
           let _list = [];
           res.list &&
             res.list.forEach(video => {
-              let item = this.playerOptions;
+              console.log(video);
+              let item = JSON.parse(JSON.stringify(this.playerOptions));
+              item.displayName = video.name;
               item.sources[0].src = video.content;
               _list.push(item);
             });
           console.log(_list);
           this.list = _list;
-          //   this.loading = false;
-          //   //   let content = res.list.content;
-          //   //   content = GetClear(content);
-          //   //   res.list.content = content;
-          //   this.data = res.list;
         } else {
           Toast(res.msg);
         }
@@ -94,5 +92,11 @@ export default {
 <style>
 .video-player {
   margin-bottom: 12px;
+}
+
+.display-name {
+  font-size: 24px;
+  margin: 10px 0;
+  margin-top: 12px;
 }
 </style>

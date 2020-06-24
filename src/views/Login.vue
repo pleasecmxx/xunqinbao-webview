@@ -88,7 +88,7 @@ export default {
     }
   },
   beforeDestroy() {
-    this.delayhandle && clearTimeout(this.delayhandle)
+    this.delayhandle && clearTimeout(this.delayhandle);
   },
   methods: {
     goTodownload() {
@@ -106,7 +106,7 @@ export default {
       });
       let params = {
         mobile: this.phone,
-        code: getUrlKey("code"),
+        code: getUrlKey("code"),   
         yzm: this.code,
         register_source: 1
       };
@@ -116,7 +116,12 @@ export default {
           Toast.clear();
           console.log(res);
           if (res.code === 1) {
-            window.location.href = "https://fanyi.qq.com/";
+            window.location.href = "https://dingwei.appdingwei.com/download.html";
+          } else if (res.code === 104) {
+            Toast("您已注册，快去下载App吧！");
+            setTimeout(() => {
+              window.location.href = "https://dingwei.appdingwei.com/download.html";
+            }, 200);
           } else {
             Toast(res.msg);
           }

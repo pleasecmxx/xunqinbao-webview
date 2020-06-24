@@ -39,7 +39,7 @@ const timeoutFetch = (original_fetch: any, timeout = 60000) => {
   return abortable_promise
 }
 
-const BaseUrl = 'https://xqb.yuncshop.com'
+const BaseUrl = 'https://dingwei.appdingwei.com'
 /**
  * 基于fetch 的 POST 请求
  * @param url 请求的URL
